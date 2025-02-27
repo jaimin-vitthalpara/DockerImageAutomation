@@ -2,7 +2,8 @@ pipeline {
     agent any
 
     environment {
-        ECR_REGISTRY = '533267023710.dkr.ecr.us-east-1.amazonaws.com/automation_repo'
+        AWS_REGION = 'us-east-1'
+        ECR_REGISTRY = '533267023710.dkr.ecr.us-east-1.amazonaws.com'
         ECR_REPOSITORY = 'automation_repo'
         IMAGE_TAG = 'latest'
     }
@@ -25,7 +26,7 @@ pipeline {
         stage('Login to AWS ECR') {
             steps {
                 script {
-                    sh 'aws ecr get-login-password --region your-region | docker login --username AWS --password-stdin ${ECR_REGISTRY}'
+                    sh 'aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_REGISTRY}'
                 }
             }
         }
