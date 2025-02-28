@@ -1,7 +1,7 @@
 pipeline {
     agent any
     tools {
-        git '/usr/bin/git'
+        git 'git'  // Use the name you configured in Global Tool Configuration
     }
 
     environment {
