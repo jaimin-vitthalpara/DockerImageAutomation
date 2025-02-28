@@ -9,6 +9,7 @@ pipeline {
         ECR_REGISTRY = '533267023710.dkr.ecr.us-east-1.amazonaws.com'
         ECR_REPOSITORY = 'automation_repo'
         IMAGE_TAG = 'latest'
+        DOCKER_HOST = 'tcp://192.168.56.33:2375'  // Your Docker VM IP
     }
 
     stages {
@@ -27,7 +28,9 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    dockerImage = docker.build("${ECR_REPOSITORY}:${IMAGE_TAG}")
+                    withEnv(["DOCKER_HOST=tcp://192.168.56.33:2375"]) {
+                        dockerImage = docker.build("${ECR_REPOSITORY}:${IMAGE_TAG}")
+                    }
                 }
             }
         }
@@ -35,8 +38,11 @@ pipeline {
         stage('Login to AWS ECR') {
             steps {
                 script {
-                    // Authenticate to ECR
-                    sh 'aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_REGISTRY}'
+                    withEnv(["DOCKER_HOST=tcp://192.168.56.33:2375"]) {
+                        sh '''
+                            aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_REGISTRY}
+                        '''
+                    }
                 }
             }
         }
@@ -44,7 +50,12 @@ pipeline {
         stage('Push Docker Image') {
             steps {
                 script {
-                    dockerImage.push("${IMAGE_TAG}")
+                    withEnv(["DOCKER_HOST=tcp://192.168.56.33:2375"]) {
+                        sh '''
+                            docker tag ${ECR_REPOSITORY}:${IMAGE_TAG} ${ECR_REGISTRY}/${ECR_REPOSITORY}:${IMAGE_TAG}
+                            docker push ${ECR_REGISTRY}/${ECR_REPOSITORY}:${IMAGE_TAG}
+                        '''
+                    }
                 }
             }
         }
