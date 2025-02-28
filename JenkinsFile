@@ -1,7 +1,7 @@
 pipeline {
     agent any
     tools {
-        git 'Git'  // Name configured in Global Tool Configuration
+        git '/usr/bin/git'
     }
 
     environment {
@@ -29,7 +29,11 @@ pipeline {
             steps {
                 script {
                     withEnv(["DOCKER_HOST=tcp://192.168.56.33:2375"]) {
-                        dockerImage = docker.build("${ECR_REPOSITORY}:${IMAGE_TAG}")
+                        sh '''
+                            echo "Docker Host: $DOCKER_HOST"
+                            docker version
+                            docker build -t ${ECR_REPOSITORY}:${IMAGE_TAG} .
+                        '''
                     }
                 }
             }
