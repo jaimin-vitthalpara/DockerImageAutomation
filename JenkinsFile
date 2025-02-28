@@ -11,7 +11,21 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git 'https://github.com/jaimin-vitthalpara/DockerImageAutomation.git'
+                script {
+                    // Using GitHub credentials stored in Jenkins for better security
+                    checkout([
+                        $class: 'GitSCM',
+                        branches: [[name: '*/main']], 
+                        userRemoteConfigs: [
+                            [
+                                url: 'https://github.com/jaimin-vitthalpara/DockerImageAutomation.git',
+                                credentialsId: 'Github'  // Replace with your GitHub credentials ID
+                            ]
+                        ],
+                        extensions: [],
+                        tool: 'Git'
+                    ])
+                }
             }
         }
 
@@ -26,6 +40,7 @@ pipeline {
         stage('Login to AWS ECR') {
             steps {
                 script {
+                    // Authenticate to ECR
                     sh 'aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_REGISTRY}'
                 }
             }
@@ -42,7 +57,7 @@ pipeline {
 
     post {
         always {
-            cleanWs()
+            cleanWs()  // Clean workspace after the build
         }
     }
 }
