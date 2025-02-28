@@ -1,5 +1,8 @@
 pipeline {
     agent any
+    tools {
+        git 'Git'  // Name configured in Global Tool Configuration
+    }
 
     environment {
         AWS_REGION = 'us-east-1'
@@ -11,20 +14,8 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                script {
-                    // Using GitHub credentials stored in Jenkins for better security
-                    checkout([
-                        $class: 'GitSCM',
-                        branches: [[name: '*/main']], 
-                        userRemoteConfigs: [
-                            [
-                                url: 'https://github.com/jaimin-vitthalpara/DockerImageAutomation.git',
-                            ]
-                        ],
-                        extensions: [],
-                        tool: 'Git'
-                    ])
-                }
+                git branch: 'main',
+                    url: 'https://github.com/jaimin-vitthalpara/DockerImageAutomation.git'
             }
         }
 
