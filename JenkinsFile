@@ -19,7 +19,6 @@ pipeline {
                         userRemoteConfigs: [
                             [
                                 url: 'https://github.com/jaimin-vitthalpara/DockerImageAutomation.git',
-                                credentialsId: 'Github'  // Replace with your GitHub credentials ID
                             ]
                         ],
                         extensions: [],
